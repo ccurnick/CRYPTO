@@ -6,7 +6,7 @@
  * contains the Main that displays the GUI.
  */
 
-package CryptoMessage;
+package cryptoMessage;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

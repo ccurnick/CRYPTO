@@ -5,9 +5,12 @@
  * Purpose: This class tests the CryptoMessage GUI and backend using three
  * evaluations on each component.
  */
-package CryptoMessageTest;
+package cryptoMessageTest;
 
-public class CryptoMessageTest {
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+public class TestMain {
     /**
      * List of test cases that are to be evaluated
      */
@@ -17,20 +20,24 @@ public class CryptoMessageTest {
      * Simply calls the constructor which performs all of the heavy lifting
      */
     public static void main(String[] args) {
-        new CryptoMessageTest();
+        new TestMain();
     }
 
     /**
      * Main loop for the program
      */
-    private CryptoMessageTest() {
+    private TestMain() {
+    	String testPassphrase = "abc";
+    	String testPlainText = "The quick brown fox jumped over the lazy dog.";
+    	String testCipherText = ""; // WARNING TODO: All tests will fail until this actually matches the encrypted string
         // Populate our list of tests with each type
-        tests.append(new BackendBruteForceTest());
-        tests.append(new BackendEncryptionTest());
-        tests.append(new BackendDecryptionTest());
-        tests.append(new E2EBruteForceTest());
-        tests.append(new E2EEncryptionTest());
-        tests.append(new E2EDecryptionTest());
+    	tests = new ArrayList<TestCase>();
+        tests.add(new BackendBruteForceTest(testCipherText, testPlainText));
+        tests.add(new BackendEncryptionTest(testPlainText, testCipherText, testPassphrase));
+        tests.add(new BackendDecryptionTest(testCipherText, testPlainText, testPassphrase));
+        tests.add(new E2EBruteForceTest(testCipherText, testPlainText));
+        tests.add(new E2EEncryptionTest(testPlainText, testCipherText, testPassphrase));
+        tests.add(new E2EDecryptionTest(testCipherText, testPlainText, testPassphrase));
 
         // Loop through and run each test
         System.out.println("Beginning evaluation of tests...");
@@ -52,17 +59,20 @@ public class CryptoMessageTest {
         long evaluationTimeInMS = TimeUnit.MILLISECONDS.convert(totalEvaluationTime, TimeUnit.NANOSECONDS);
 
         // Summarize some output
-        System.out.println("Total tests: {} of {} passed".format(successfulTests, tests.length));
-        System.out.println("Total evaluation time: {} ms".format(evaluationTimeInMS));
+        System.out.format("Total tests: %d of %d passed", successfulTests, tests.size());
+        System.out.println("");
+        System.out.format("Total evaluation time: %d ms", evaluationTimeInMS);
+        System.out.println("");
     }
 
     /**
      * Performs a single test given a test case to run
      */
-    private runTest(TestCase testCase) {
+    private void runTest(TestCase testCase) {
         // Header information printed before the test is run
         System.out.println("=======BEGIN TEST======");
-        System.out.println("Test Name: {}".format(testCase.getTitle()));
+        System.out.format("Test Name: %s", testCase.getTitle());
+        System.out.println("");
         System.out.println("");
         System.out.println(testCase.getDescription());
         System.out.println("");
@@ -72,9 +82,12 @@ public class CryptoMessageTest {
         long evaluationTimeInMS = TimeUnit.MILLISECONDS.convert(testCase.getEvaluationTime(), TimeUnit.NANOSECONDS);
 
         // Print the results of the test
-        System.out.println("Test result: {}".format(result));
-        System.out.println("Test success: {}".format(testCase.isSuccessful()));
-        System.out.println("Test evaluation time: {} ms".format(evaluationTimeInMS));
+        System.out.format("Test result: %s", result);
+        System.out.println("");
+        System.out.format("Test success: %b", testCase.isSuccessful());
+        System.out.println("");
+        System.out.format("Test evaluation time: %d ms", evaluationTimeInMS);
+        System.out.println("");
         System.out.println("======END TEST======");
     }
 }

@@ -4,7 +4,7 @@
  * Author: Team Crypto 2018! 
  * Purpose: This class serves as a template for all tests to inherit from
  */
-package CryptoMessageTest;
+package cryptoMessageTest;
 
 public class TestCase {
     /**
