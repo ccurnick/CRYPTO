@@ -12,6 +12,7 @@ public class CryptoMessageTest {
      * List of test cases that are to be evaluated
      */
     ArrayList<TestCase> tests;
+    
     /**
      * Simply calls the constructor which performs all of the heavy lifting
      */
@@ -23,6 +24,7 @@ public class CryptoMessageTest {
      * Main loop for the program
      */
     private CryptoMessageTest() {
+        // Populate our list of tests with each type
         tests.append(new BackendBruteForceTest());
         tests.append(new BackendEncryptionTest());
         tests.append(new BackendDecryptionTest());
@@ -30,6 +32,7 @@ public class CryptoMessageTest {
         tests.append(new E2EEncryptionTest());
         tests.append(new E2EDecryptionTest());
 
+        // Loop through and run each test
         System.out.println("Beginning evaluation of tests...");
         for (TestCase testCase : tests) {
             runTest(testCase);
@@ -48,17 +51,27 @@ public class CryptoMessageTest {
         }
         long evaluationTimeInMS = TimeUnit.MILLISECONDS.convert(totalEvaluationTime, TimeUnit.NANOSECONDS);
 
+        // Summarize some output
         System.out.println("Total tests: {} of {} passed".format(successfulTests, tests.length));
         System.out.println("Total evaluation time: {} ms".format(evaluationTimeInMS));
     }
+
+    /**
+     * Performs a single test given a test case to run
+     */
     private runTest(TestCase testCase) {
+        // Header information printed before the test is run
         System.out.println("=======BEGIN TEST======");
         System.out.println("Test Name: {}".format(testCase.getTitle()));
         System.out.println("");
         System.out.println(testCase.getDescription());
         System.out.println("");
+
+        // Run the actual test and get back the results
         String result = testCase.evaluateTest();
         long evaluationTimeInMS = TimeUnit.MILLISECONDS.convert(testCase.getEvaluationTime(), TimeUnit.NANOSECONDS);
+
+        // Print the results of the test
         System.out.println("Test result: {}".format(result));
         System.out.println("Test success: {}".format(testCase.isSuccessful()));
         System.out.println("Test evaluation time: {} ms".format(evaluationTimeInMS));
