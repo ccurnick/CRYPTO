@@ -30,7 +30,7 @@ public class E2EDecryptionTest extends TestCase {
         frontEnd = new CryptoMessageGUI();
         // relink the buttons
         // populate the passphrase with "abc"
-        // click the encrypt button
+        // click the decrypt button
         // pass back our file
         // validate that the expected result is in the text field
     }

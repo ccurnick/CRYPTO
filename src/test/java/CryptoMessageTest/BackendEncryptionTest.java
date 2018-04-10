@@ -24,7 +24,7 @@ public class BackendEncryptionTest extends TestCase {
     }
 
     /**
-     * Performs a test of the front end
+     * Performs a test of the back end
      */
     public runTest() {
         backEnd = new CryptoMessageBackend();
