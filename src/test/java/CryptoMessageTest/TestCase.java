@@ -11,7 +11,7 @@ public class TestCase {
      * Contains the result of the test
      * True if successful, false otherwise
      */
-    protected boolean isSuccessful = false;
+    protected boolean successful = false;
     /**
      * If an error occurred during the testing, this contains the message
      * If no error occurred this will be blank
@@ -62,7 +62,7 @@ public class TestCase {
             runTest();
         } catch(Exception e) {
             // If an exception is thrown catch it here so that it doesn't bubble out of the test
-            isSuccessful = false;
+            successful = false;
             errorMessage = "Uncaught exception occurred: " + e.getLocalizedMessage();
         }
         // Measure how long the test took to run
@@ -70,5 +70,40 @@ public class TestCase {
         this.evaluationTime = endTime - startTime;
         // Return the error message that was set (if any)
         return errorMessage;
+    }
+
+    /**
+     * Gets successuful state
+     */
+    public boolean isSuccessful() {
+        return successful;
+    }
+
+    /**
+     * Gets error message
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * Gets evaluation time
+     */
+    public long getEvaluationTime() {
+        return evaluationTime;
+    }
+
+    /**
+     * Gets title
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * Gets description
+     */
+    public String getDescription() {
+        return description;
     }
 }
