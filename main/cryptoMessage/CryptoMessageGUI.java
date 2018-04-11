@@ -46,7 +46,7 @@ public class CryptoMessageGUI extends JFrame{
     private JLabel openText = new JLabel("**File Name Appears Here**              ");
 	public JTextField keyText = new JTextField();
 	public JFrame frame;
-	public JButton openButton = new JButton("Open File");
+	public JButton openButton;
 	public JButton encryptButton;
 	
 	/*
@@ -65,7 +65,7 @@ public class CryptoMessageGUI extends JFrame{
 		JPanel decryptPanel = new JPanel(new GridLayout(2, 0, 5, 5));
 		JPanel decryptControlPanel = new JPanel(new GridBagLayout());
 		JPanel decryptTextPanel = new JPanel();
-        JButton encryptButton = new JButton("Encrypt");
+        encryptButton = new JButton("Encrypt");
         JLabel keyLabel = new JLabel("Secret Key");
         openButton = new JButton("Open File");
         Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
