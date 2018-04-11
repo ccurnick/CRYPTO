@@ -45,6 +45,7 @@ public class CryptoMessageGUI extends JFrame{
 	public JTextArea decryptTextDisplay = new JTextArea();
     private JLabel openText = new JLabel("**File Name Appears Here**              ");
 	public JTextField keyText = new JTextField();
+	public JFrame frame;
 	
 	/*
 	 * Default constructor
@@ -54,7 +55,7 @@ public class CryptoMessageGUI extends JFrame{
     		/*
     		 * Create Button, and Labels for data input
     		 */
-        JFrame frame = new JFrame("Crypto Message Maker 0.1");
+        frame = new JFrame("Crypto Message Maker 0.1");
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel encryptPanel = new JPanel(new GridLayout(2, 0, 5, 5));
 		JPanel encryptControlPanel = new JPanel(new GridBagLayout());
@@ -144,7 +145,6 @@ public class CryptoMessageGUI extends JFrame{
     		frame.setMinimumSize(tabbedPane.getSize());
     		frame.setResizable(true);
     		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    		frame.setVisible(true);
     		
     } //END CryptoMessageGUI Constructor
 
@@ -201,7 +201,8 @@ public class CryptoMessageGUI extends JFrame{
 	public static void main(String[] args) {
 
 		//Creating CryptoMessage Object from CryptoMessage Class
-	    CryptoMessageGUI sp = new CryptoMessageGUI();			    
+	    CryptoMessageGUI sp = new CryptoMessageGUI();	
+		sp.frame.setVisible(true);		    
 	} //END MAIN
 
 } // END CryptoMessage Class
