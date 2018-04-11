@@ -47,6 +47,7 @@ public class CryptoMessageGUI extends JFrame{
 	public JTextField keyText = new JTextField();
 	public JFrame frame;
 	public JButton openButton = new JButton("Open File");
+	public JButton encryptButton;
 	
 	/*
 	 * Default constructor
