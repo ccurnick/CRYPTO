@@ -41,10 +41,10 @@ public class CryptoMessageGUI extends JFrame{
 	*  GLobal objects for the GUI
 	*/
 	private JFileChooser fc = null;
-	private JTextArea encryptTextDisplay = new JTextArea();
-	private JTextArea decryptTextDisplay = new JTextArea();
+	public JTextArea encryptTextDisplay = new JTextArea();
+	public JTextArea decryptTextDisplay = new JTextArea();
     private JLabel openText = new JLabel("**File Name Appears Here**              ");
-	private JTextField keyText = new JTextField();
+	public JTextField keyText = new JTextField();
 	
 	/*
 	 * Default constructor
