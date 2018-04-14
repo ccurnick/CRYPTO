@@ -43,10 +43,13 @@ public class CryptoMessageGUI extends JFrame{
 	*  GLobal objects for the GUI
 	*/
 	private JFileChooser fc = null;
-	private JTextArea encryptTextDisplay = new JTextArea();
-	private JTextArea decryptTextDisplay = new JTextArea();
+	public JTextArea encryptTextDisplay = new JTextArea();
+	public JTextArea decryptTextDisplay = new JTextArea();
     private JLabel openText = new JLabel("**File Name Appears Here**              ");
-	private JTextField keyText = new JTextField();
+	public JTextField keyText = new JTextField();
+	public JFrame frame;
+	public JButton openButton;
+	public JButton encryptButton;
 	
 	/*
 	 * Default constructor
@@ -56,7 +59,7 @@ public class CryptoMessageGUI extends JFrame{
     		/*
     		 * Create Button, and Labels for data input
     		 */
-        JFrame frame = new JFrame("Crypto Message Maker 0.1");
+        frame = new JFrame("Crypto Message Maker 0.1");
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel encryptPanel = new JPanel(new BorderLayout());
 		JPanel encryptControlPanel = new JPanel(new GridBagLayout());
@@ -64,9 +67,9 @@ public class CryptoMessageGUI extends JFrame{
 		JPanel decryptPanel = new JPanel(new BorderLayout());
 		JPanel decryptControlPanel = new JPanel(new GridBagLayout());
 		JPanel decryptTextPanel = new JPanel(new BorderLayout());
-        JButton encryptButton = new JButton("Encrypt");
+        encryptButton = new JButton("Encrypt");
         JLabel keyLabel = new JLabel("Secret Key");
-        JButton openButton = new JButton("Open File");
+        openButton = new JButton("Open File");
         Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 		
 		/*
@@ -128,12 +131,6 @@ public class CryptoMessageGUI extends JFrame{
 
 			keyText.setColumns(15);
 			openText.setOpaque(true);
-				
-    		
-         	/*
-    		 * Listeners for button presses and other event sources
-    		 */
-        	openButton.addActionListener(e -> openFile());
 
         
     		
@@ -146,7 +143,6 @@ public class CryptoMessageGUI extends JFrame{
     		frame.setMinimumSize(tabbedPane.getSize());
     		frame.setResizable(true);
     		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    		frame.setVisible(true);
     		
     } //END CryptoMessageGUI Constructor
 
@@ -203,7 +199,14 @@ public class CryptoMessageGUI extends JFrame{
 	public static void main(String[] args) {
 
 		//Creating CryptoMessage Object from CryptoMessage Class
-	    CryptoMessageGUI sp = new CryptoMessageGUI();			    
+	    CryptoMessageGUI sp = new CryptoMessageGUI();	
+		sp.frame.setVisible(true);	
+				
+    		
+		/*
+		* Listeners for button presses and other event sources
+		*/
+	   sp.openButton.addActionListener(e -> sp.openFile());	    
 	} //END MAIN
 
 } // END CryptoMessage Class
