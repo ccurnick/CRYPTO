@@ -32,6 +32,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.w3c.dom.ls.LSException;
+
 /*
 * Class for building the CryptoMessage GUI.
 */
@@ -56,12 +58,12 @@ public class CryptoMessageGUI extends JFrame{
     		 */
         JFrame frame = new JFrame("Crypto Message Maker 0.1");
 		JTabbedPane tabbedPane = new JTabbedPane();
-		JPanel encryptPanel = new JPanel(new GridLayout(2, 0, 5, 5));
+		JPanel encryptPanel = new JPanel(new BorderLayout());
 		JPanel encryptControlPanel = new JPanel(new GridBagLayout());
-		JPanel encryptTextPanel = new JPanel();
-		JPanel decryptPanel = new JPanel(new GridLayout(2, 0, 5, 5));
+		JPanel encryptTextPanel = new JPanel(new BorderLayout());
+		JPanel decryptPanel = new JPanel(new BorderLayout());
 		JPanel decryptControlPanel = new JPanel(new GridBagLayout());
-		JPanel decryptTextPanel = new JPanel();
+		JPanel decryptTextPanel = new JPanel(new BorderLayout());
         JButton encryptButton = new JButton("Encrypt");
         JLabel keyLabel = new JLabel("Secret Key");
         JButton openButton = new JButton("Open File");
@@ -70,7 +72,7 @@ public class CryptoMessageGUI extends JFrame{
 		/*
          * Building the main Tabbed Panel
          */
-    		frame.add(tabbedPane, BorderLayout.CENTER);
+    		frame.add(tabbedPane);
     		
     		/*
     		 * Setting borders and titles for the panels
@@ -87,11 +89,11 @@ public class CryptoMessageGUI extends JFrame{
 			JScrollPane encryptScroll = new JScrollPane(encryptTextDisplay); 
 			JScrollPane decryptScroll = new JScrollPane(decryptTextDisplay); 
 
-			encryptTextPanel.add(encryptScroll);
-			decryptTextPanel.add(decryptScroll);
+			encryptTextPanel.add(encryptScroll, BorderLayout.CENTER);
+			decryptTextPanel.add(decryptScroll, BorderLayout.CENTER);
 			
     		/*
-    		 * Add Components to frame using addComp Method for 
+    		 * Add Components to control panels using addComp Method for 
     		 * GridBagLayout manager (***Technique from Derek Banas Java Tutorial***)
 			 * ***Method for adding listed below***
     		 */
@@ -104,10 +106,11 @@ public class CryptoMessageGUI extends JFrame{
 			/*
 			* Adding all elements to the encrypt and decrypt panels.
 			*/
-			encryptPanel.add(encryptControlPanel);
-			encryptPanel.add(encryptTextPanel);
-			decryptPanel.add(decryptControlPanel);
-			decryptPanel.add(decryptTextPanel);
+
+			encryptPanel.add(encryptControlPanel, BorderLayout.NORTH);
+			encryptPanel.add(encryptTextPanel, BorderLayout.CENTER);
+			decryptPanel.add(decryptControlPanel, BorderLayout.NORTH);
+			decryptPanel.add(decryptTextPanel, BorderLayout.CENTER);
 			
 			/*
 			* Adding the encrypt and decrypt panels to the tabbed panel.
@@ -137,7 +140,6 @@ public class CryptoMessageGUI extends JFrame{
     		/*
     		 * Setting frame size, visible and close operation
     		 */
-
 			encryptPanel.validate();
 			decryptPanel.validate();
 			frame.pack();
