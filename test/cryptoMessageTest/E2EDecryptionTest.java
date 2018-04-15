@@ -17,7 +17,7 @@ public class E2EDecryptionTest extends TestCase {
     /**
      * Encrypted text to test
      */
-    private final String encryptedText;
+    private final byte[] encryptedText;
     /**
      * Passphrase to use to decrypt
      */
@@ -29,7 +29,7 @@ public class E2EDecryptionTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public E2EDecryptionTest(String encryptedText, String expectedResult,
+    public E2EDecryptionTest(byte[] encryptedText, String expectedResult,
             String passphrase) {
         super("E2EDecryption", "Tests the end-to-end functionality by " +
               "the actual window and simulates clicking the different " +

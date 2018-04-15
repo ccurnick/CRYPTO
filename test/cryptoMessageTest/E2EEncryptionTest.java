@@ -25,11 +25,11 @@ public class E2EEncryptionTest extends TestCase {
     /**
      * Expected result from the brute force
      */
-    private final String expectedResult;
+    private final byte[] expectedResult;
     /**
      * Initializes the test case
      */
-    public E2EEncryptionTest(String plainText, String expectedResult,
+    public E2EEncryptionTest(String plainText, byte[] expectedResult,
             String passphrase) {
         super("E2EEncryption", "Tests the end-to-end functionality by " +
               "the actual window and simulates clicking the different " +
@@ -47,7 +47,7 @@ public class E2EEncryptionTest extends TestCase {
         // relink the buttons
         // populate the passphrase with "abc"
         // click the encrypt button
-        String result = "";
+        byte[] result = new byte[1];
         // TODO: pull the result from the text field
         // validate that the expected result is in the text field
         if(result == expectedResult) {

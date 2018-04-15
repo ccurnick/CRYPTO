@@ -6,6 +6,8 @@
  */
 package cryptoMessageTest;
 
+import java.nio.charset.Charset;
+
 public class TestCase {
     /**
      * Contains the result of the test
@@ -30,6 +32,11 @@ public class TestCase {
      * A description for this test, detailing what entails
      */
     protected String description;
+    
+    /**
+     * Character set for UTF8
+     */
+	protected final Charset UTF8_CHARSET = Charset.forName("UTF-8");
     
     
     /**

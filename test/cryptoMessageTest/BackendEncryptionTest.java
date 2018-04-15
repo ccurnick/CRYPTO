@@ -8,6 +8,7 @@
 package cryptoMessageTest;
 
 import cryptoMessage.CryptoMessageBackend;
+import java.util.Arrays;
 
 public class BackendEncryptionTest extends TestCase {
     /**
@@ -25,11 +26,11 @@ public class BackendEncryptionTest extends TestCase {
     /**
      * Expected result from the brute force
      */
-    private final String expectedResult;
+    private final byte[] expectedResult;
     /**
      * Initializes the test case
      */
-    public BackendEncryptionTest(String plainText, String expectedResult,
+    public BackendEncryptionTest(String plainText, byte[] expectedResult,
                                  String passphrase) {
         super("BackendEncryptionTest", "Tests the backend functionality by " +
               "sending a plain text and password to the backend and " +
@@ -52,7 +53,7 @@ public class BackendEncryptionTest extends TestCase {
             return;
         }
         // pass back our plain text file contents
-        String result;
+        byte[] result;
         try {
             result = backEnd.encrypt(plainText, passphrase);
         } catch(Exception e) {
@@ -60,12 +61,15 @@ public class BackendEncryptionTest extends TestCase {
             return;
         }
         // validate that the expected result is returned
-        if(result == expectedResult) {
+        if(Arrays.equals(result, expectedResult)) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
                     "Expected: %s, Received: %s",
-                    expectedResult, result);
+                    new String(expectedResult, UTF8_CHARSET), new String(result, UTF8_CHARSET));
+            for(int i = 0; i < result.length; i++) {
+            	System.out.println(result[i]);
+            }
         }
     }
 }

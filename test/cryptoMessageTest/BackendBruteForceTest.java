@@ -17,7 +17,7 @@ public class BackendBruteForceTest extends TestCase {
     /**
      * Encrypted text to test
      */
-    private final String encryptedText;
+    private final byte[] encryptedText;
     /**
      * Expected result from the brute force
      */
@@ -25,7 +25,7 @@ public class BackendBruteForceTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public BackendBruteForceTest(String encryptedText, String expectedResult) {
+    public BackendBruteForceTest(byte[] encryptedText, String expectedResult) {
         super("BackendBruteForce", "Tests the backend functionality by " +
               "sending an encrypted text to the backend and expecting " +
               "a decrypted result within a reasonable(1 minute) amount " +

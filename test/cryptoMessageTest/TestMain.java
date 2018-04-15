@@ -29,7 +29,11 @@ public class TestMain {
     private TestMain() {
     	String testPassphrase = "abc";
     	String testPlainText = "The quick brown fox jumped over the lazy dog.";
-    	String testCipherText = ""; // WARNING TODO: All tests will fail until this actually matches the encrypted string
+    	byte[] testCipherText = new byte[] {
+    			-72,109,6,-71,0,81,-35,-9,126,-5,-90,-105,115,18,47,93,64,-113,-93,
+    			-110,-80,-30,-61,39,85,-102,-48,-114,-31,111,-38,22,-3,25,-23,38,
+    			38,-127,61,-99,37,81,-31,32,44,-31,6,-45
+    	}; // WARNING TODO: All tests will fail until this actually matches the encrypted string
         // Populate our list of tests with each type
     	tests = new ArrayList<TestCase>();
         tests.add(new BackendBruteForceTest(testCipherText, testPlainText));

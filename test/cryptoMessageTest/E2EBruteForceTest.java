@@ -17,7 +17,7 @@ public class E2EBruteForceTest extends TestCase {
     /**
      * Encrypted text to test
      */
-    private final String encryptedText;
+    private final byte[] encryptedText;
     /**
      * Expected result from the brute force
      */
@@ -25,7 +25,7 @@ public class E2EBruteForceTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public E2EBruteForceTest(String encryptedText, String expectedResult) {
+    public E2EBruteForceTest(byte[] encryptedText, String expectedResult) {
         super("E2EBruteForce", "Tests the end-to-end functionality by " +
                 "the actual window and simulates clicking the different " +
                 "components.");

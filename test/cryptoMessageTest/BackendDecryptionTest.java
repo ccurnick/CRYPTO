@@ -17,7 +17,7 @@ public class BackendDecryptionTest extends TestCase {
     /**
      * Encrypted text to test
      */
-    private final String encryptedText;
+    private final byte[] encryptedText;
     /**
      * Passphrase to use to decrypt
      */
@@ -29,7 +29,7 @@ public class BackendDecryptionTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public BackendDecryptionTest(String encryptedText, String expectedResult,
+    public BackendDecryptionTest(byte[] encryptedText, String expectedResult,
                                  String passphrase) {
         super("BackendDecryptionTest", "Tests the backend functionality by " +
               "sending a ciphertext and password to the backend and " +
@@ -60,7 +60,7 @@ public class BackendDecryptionTest extends TestCase {
             return;
         }
         // validate that the expected result is returned
-        if(result == expectedResult) {
+        if(result.compareTo(expectedResult) == 0) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
