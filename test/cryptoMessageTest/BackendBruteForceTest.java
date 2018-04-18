@@ -60,8 +60,8 @@ public class BackendBruteForceTest extends TestCase {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
-                    "Expected: %s, Received: %s",
-                    expectedResult, result);
+                    "Expected: %s, Received: %s\nError message: %s",
+                    expectedResult, result, backEnd.errorMessage);
         }
     }
 }
