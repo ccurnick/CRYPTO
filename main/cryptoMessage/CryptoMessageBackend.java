@@ -58,7 +58,7 @@ public class CryptoMessageBackend {
 				throw new NoSuchAlgorithmException(); // This should never be reached as it should be caught by Cipher.getInstance
 		}
 		byte[] ivbytes = new byte[cipherSize];
-		for(int i = 0; i < 16; i++) {
+		for(int i = 0; i < cipherSize; i++) {
 			ivbytes[i] = 1;
 		}
 	}
