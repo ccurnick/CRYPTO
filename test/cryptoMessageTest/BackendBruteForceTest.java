@@ -47,7 +47,7 @@ public class BackendBruteForceTest extends TestCase {
             return;
         }
         // pass back our encrypted file contents
-        // TODO:start a thread that expires after 1 minute
+        // TODO:start a thread that expires after 5 minutes
         String result;
         try {
             result = backEnd.bruteForce(encryptedText, "AES");
