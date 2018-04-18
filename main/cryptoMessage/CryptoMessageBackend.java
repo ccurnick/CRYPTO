@@ -153,6 +153,13 @@ public class CryptoMessageBackend {
 		return "".getBytes();
 	}
 
+	/**
+	 * External interface to perform a brute force of an encrypted text
+	 * 
+	 * @param message		Bytes to decrypt
+	 * @param cipherName	Name of the cipher to use (AES)
+	 * @return Encrypted text on success, blank on bad cipher
+	 */
 	public String bruteForce(byte[] message, String cipherName) {
 		try {
 			initializeCipher(cipherName);
@@ -172,6 +179,13 @@ public class CryptoMessageBackend {
 		return result;
 	}
 
+	/**
+	 * Increments a possible brute force password value
+	 * Increases from ABC -> ABD or from ZZZ -> AAAA
+	 * 
+	 * @param arr	Bytes to increase value of
+	 * @return 		New password value to attempt
+	 */
 	private byte[] incrementBruteForce(byte[] arr) {
 		// Loop through each character, starting with the final character
 		for(int i = arr.length - 1; i >= 0; i--) {
