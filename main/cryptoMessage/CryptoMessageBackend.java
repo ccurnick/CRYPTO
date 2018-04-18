@@ -14,12 +14,13 @@ public class CryptoMessageBackend {
 	private Cipher cipher;
 	private final String characterSetName = "US-ASCII";
 	private final int PBEPERMUTATIONS = 128;
-	private final int PBEKEYSIZE = 256;
 	private final Charset ASCII_CHARSET = Charset.forName(characterSetName);
 	private final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
 	private SecureRandom rng;
 	private IvParameterSpec iv;
+	private int pbekeysize;
 	private String cipherName;
+	public String errorMessage;
 	public CryptoMessageBackend() {
 		// Blank constructor
 	}
@@ -27,7 +28,7 @@ public class CryptoMessageBackend {
 		try {
 			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 		} catch(NoSuchAlgorithmException e) {
-			// Handle no factory error
+			errorMessage = e.getMessage();
 		}
 		rng = new SecureRandom(new byte[] {0,1,2,3,4,5});
 	}
@@ -47,12 +48,15 @@ public class CryptoMessageBackend {
 		switch(cipherName) {
 			case "AES":
 				cipherSize = 16;
+				pbekeysize = 256;
 				break;
 			case "DES":
-				cipherSize = 7;
+				cipherSize = 8;
+				pbekeysize = 64;
 				break;
 			case "DESede":
-				cipherSize = 21;
+				cipherSize = 8;
+				pbekeysize = 192;
 				break;
 			default:
 				throw new NoSuchAlgorithmException(); // This should never be reached as it should be caught by Cipher.getInstance
@@ -61,6 +65,7 @@ public class CryptoMessageBackend {
 		for(int i = 0; i < cipherSize; i++) {
 			ivbytes[i] = 1;
 		}
+		iv = new IvParameterSpec(ivbytes);
 	}
 	
 	/**
@@ -72,26 +77,28 @@ public class CryptoMessageBackend {
 	 */
 	private String doDecrypt(byte[] message, String secret) {
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, PBEKEYSIZE);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, pbekeysize);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
 		} catch(InvalidKeySpecException e) {
-			// More error messaging maybe?
+			errorMessage = "IKS:" + e.getMessage();
 			return "";
 		}
 		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), cipherName);
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, secretKey, iv, rng);
 		} catch(InvalidKeyException e) {
+			errorMessage = "IK:" + e.getMessage();
 			return "";
 		} catch(InvalidAlgorithmParameterException e) {
+			errorMessage = "IAP:" + e.getMessage();
 			return "";
 		}
 		try {
 			return new String(cipher.doFinal(message), ASCII_CHARSET);
 		} catch(Exception e) {
-			// Fall through
+			errorMessage = "Final:" + e.getMessage();
 		}
 		return "";
 	}
@@ -107,8 +114,10 @@ public class CryptoMessageBackend {
 		try {
 			initializeCipher(cipherName);
 		} catch(NoSuchAlgorithmException e) {
+			errorMessage = "NSA:" + e.getMessage();
 			return "";
 		} catch(NoSuchPaddingException e) {
+			errorMessage = "NSP:" + e.getMessage();
 			return "";
 		}
 		return doDecrypt(message, secret);
@@ -126,29 +135,32 @@ public class CryptoMessageBackend {
 		try {
 			initializeCipher(cipherName);
 		} catch(NoSuchAlgorithmException e) {
+			errorMessage = "NSA:" + e.getMessage();
 			return "".getBytes();
 		} catch(NoSuchPaddingException e) {
+			errorMessage = "NSP:" + e.getMessage();
 			return "".getBytes();
 		}
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, PBEKEYSIZE);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, pbekeysize);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
 		} catch(InvalidKeySpecException e) {
-			// More error messaging maybe?
+			errorMessage = "IKS:" + e.getMessage();
 			return "".getBytes();
 		}
 		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), cipherName);
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, rng);
 		} catch(/*InvalidKey*/Exception e) {
+			errorMessage = "Init:" + e.getMessage();
 			return "".getBytes();
 		}
 		try {
 			return cipher.doFinal(message.getBytes(characterSetName));
 		} catch(Exception e) {
-			// Fall through
+			errorMessage = "Final:" + e.getMessage();
 		}
 		return "".getBytes();
 	}
@@ -164,8 +176,10 @@ public class CryptoMessageBackend {
 		try {
 			initializeCipher(cipherName);
 		} catch(NoSuchAlgorithmException e) {
+			errorMessage = "NSA:" + e.getMessage();
 			return "";
 		} catch(NoSuchPaddingException e) {
+			errorMessage = "NSP:" + e.getMessage();
 			return "";
 		}
 		// Initialize our current secret key
