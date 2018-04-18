@@ -11,20 +11,21 @@ package cryptoMessage;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.IOException;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -42,24 +43,31 @@ public class CryptoMessageGUI extends JFrame{
 	/*
 	*  GLobal objects for the GUI
 	*/
-	private JFileChooser fc = null;
+	private JFileChooser fc;
 	public JTextArea encryptTextDisplay = new JTextArea();
 	public JTextArea decryptTextDisplay = new JTextArea();
-    private JLabel openText = new JLabel("**File Name Appears Here**              ");
+    private JLabel openText = new JLabel("**File Name Appears Here**");
 	public JTextField keyText = new JTextField();
-	public JFrame frame;
-	public JButton openButton;
-	public JButton encryptButton;
-	
+	public JTextField decryptKeyText = new JTextField();
+	public JFrame frame = new JFrame("Crypto Message Maker 0.1");
+	public JButton openButton = new JButton("Open File");
+	public JButton encryptButton = new JButton("Encrypt");
+	public JButton decryptButton = new JButton("Decrypt");
+	public JButton bruteForceButton = new JButton("Brute Force");
+	private String[] cryptoChoice = {"AES", "DES", "DESede"};
+	private JComboBox<String> cryptoDropBox = new JComboBox<String>(cryptoChoice);
+	private JComboBox<String> decryptDropBox = new JComboBox<String>(cryptoChoice);
+	private CryptoMessageBackend cryptoBackend = new CryptoMessageBackend();
+	private Path openFile;
+
 	/*
 	 * Default constructor
 	 */
     public CryptoMessageGUI() {
 
-    		/*
-    		 * Create Button, and Labels for data input
-    		 */
-        frame = new JFrame("Crypto Message Maker 0.1");
+    	/*
+    	 * Create Panels and labels for data input
+    	 */
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel encryptPanel = new JPanel(new BorderLayout());
 		JPanel encryptControlPanel = new JPanel(new GridBagLayout());
@@ -67,9 +75,8 @@ public class CryptoMessageGUI extends JFrame{
 		JPanel decryptPanel = new JPanel(new BorderLayout());
 		JPanel decryptControlPanel = new JPanel(new GridBagLayout());
 		JPanel decryptTextPanel = new JPanel(new BorderLayout());
-        encryptButton = new JButton("Encrypt");
-        JLabel keyLabel = new JLabel("Secret Key");
-        openButton = new JButton("Open File");
+		JLabel keyLabel = new JLabel("Secret Key");
+		JLabel decryptKeyLabel = new JLabel("Secret Key");
         Border loweredetched = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
 		
 		/*
@@ -88,10 +95,8 @@ public class CryptoMessageGUI extends JFrame{
 			/*
     		 * Add text panels to JScrollPanes for Encrypt Display and Decrypt Display
     		 */
-
 			JScrollPane encryptScroll = new JScrollPane(encryptTextDisplay); 
 			JScrollPane decryptScroll = new JScrollPane(decryptTextDisplay); 
-
 			encryptTextPanel.add(encryptScroll, BorderLayout.CENTER);
 			decryptTextPanel.add(decryptScroll, BorderLayout.CENTER);
 			
@@ -100,16 +105,20 @@ public class CryptoMessageGUI extends JFrame{
     		 * GridBagLayout manager (***Technique from Derek Banas Java Tutorial***)
 			 * ***Method for adding listed below***
     		 */
-    		addComp(encryptControlPanel, keyLabel, 0, 1, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
-    		addComp(encryptControlPanel, keyText, 1, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.NONE);
-    		addComp(encryptControlPanel, encryptButton, 2, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);   		
+    		addComp(encryptControlPanel, keyLabel, 0, 0, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
+    		addComp(encryptControlPanel, keyText, 1, 0, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.NONE);
+			addComp(encryptControlPanel, cryptoDropBox, 2, 0, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.NONE);
+			addComp(encryptControlPanel, encryptButton, 3, 0, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);   		
     		addComp(decryptControlPanel, openButton, 0, 0, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
-			addComp(decryptControlPanel, openText, 1, 0, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);			
+			addComp(decryptControlPanel, openText, 1, 0, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
+			addComp(decryptControlPanel, decryptKeyLabel, 0, 1, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
+    		addComp(decryptControlPanel, decryptKeyText, 1, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.NONE);
+			addComp(decryptControlPanel, decryptDropBox, 2, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
+			addComp(decryptControlPanel, decryptButton, 3, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);   				
 
 			/*
 			* Adding all elements to the encrypt and decrypt panels.
 			*/
-
 			encryptPanel.add(encryptControlPanel, BorderLayout.NORTH);
 			encryptPanel.add(encryptTextPanel, BorderLayout.CENTER);
 			decryptPanel.add(decryptControlPanel, BorderLayout.NORTH);
@@ -128,12 +137,10 @@ public class CryptoMessageGUI extends JFrame{
 			encryptTextDisplay.setRows(10);
 			decryptTextDisplay.setRows(10);
 			decryptTextDisplay.setColumns(30);
-
 			keyText.setColumns(15);
+			decryptKeyText.setColumns(15);
 			openText.setOpaque(true);
-
-        
-    		
+	
     		/*
     		 * Setting frame size, visible and close operation
     		 */
@@ -147,37 +154,57 @@ public class CryptoMessageGUI extends JFrame{
     } //END CryptoMessageGUI Constructor
 
 	/*
-	* Method for opening a file and displaying its contents in the display
+	* Internal method for opening a file and displaying its contents in the display
 	*/
     private void openFile(){
-        		if (fc == null){
-        			fc = new JFileChooser();
-            		fc .setCurrentDirectory(new java.io.File("."));
-            		fc.setDialogTitle("Select Data File");
-            		
-        			FileNameExtensionFilter filter = new FileNameExtensionFilter("txt Files", "txt", "text");
-        			fc.setFileFilter(filter);
-        			fc.setAcceptAllFileFilterUsed(false);      			
-        		}
+		//Creating new filechooser and setting file filters
+		fc = new JFileChooser();
+        fc .setCurrentDirectory(new java.io.File("."));
+        fc.setDialogTitle("Select Data File");           		
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("txt Files", "txt", "text");
+        fc.setFileFilter(filter);
+        fc.setAcceptAllFileFilterUsed(false);      			
 
-        		//Show the dialog window
-				int returnVal = fc.showOpenDialog(null);
-				//Process the results.
-    			if (returnVal == JFileChooser.APPROVE_OPTION) {
-					/*----------------------------------
-					Need to add parser to read file
-					input to display text in JText Area
-					in the Try block.
-					------------------------------------*/
-					
-					//Setting dataDisply window.
-							openText.setText("Current File: " + fc.getSelectedFile().getName());
-				}
+        //Show the dialog window
+		int returnVal = fc.showOpenDialog(null);
+			
+		//Displaying Path to selected file.
+    	if (returnVal == JFileChooser.APPROVE_OPTION) {
+			openFile = Paths.get(fc.getSelectedFile().getAbsolutePath());
+			openText.setText("Current File: " + fc.getSelectedFile().getName());
+		}
+    } //END openFile() Method
+	
+	/*
+	 * Internal method for calling encrypt() in backend after button press
+	 */
+	private void encryptText(){
+		cryptoBackend.encrypt(encryptTextDisplay.getText(), keyText.getText(), cryptoDropBox.getSelectedItem().toString());
+	} //END encryptText() Method
+	
+	/*
+	 * Internal method for calling decrypt() in backend after button press
+	 * Reads the selected file into a byte array to pass it to backend.
+	 */
+	private void decryptText(){
+		Files file = null;
+		byte[] array = null;
+		try{
+		array = file.readAllBytes(openFile);
+		} catch (IOException e) {
+			System.out.print(e);
+		} 
+		cryptoBackend.decrypt(array, decryptKeyText.getText(), decryptDropBox.getSelectedItem().toString());
+	}
 
-        		//Resets FileChooser
-        		fc.setSelectedFile(null);
-        } //END openFile() Method
- 
+	/*
+	 * Internal method for calling bruteForce() in backend after button press
+	 * Reads the selected file into a byte array to pass it to backend.
+	 */
+	private void bruteForceText(){
+		//***Place holder until brute force decryption implemented.***
+	}
+
     /*
      * Method for adding Components to JPanels using GridBagLayout. 
      * (***Technique copied from Derek Banas Java Tutorial on YouTube***)
@@ -201,12 +228,14 @@ public class CryptoMessageGUI extends JFrame{
 		//Creating CryptoMessage Object from CryptoMessage Class
 	    CryptoMessageGUI sp = new CryptoMessageGUI();	
 		sp.frame.setVisible(true);	
-				
-    		
+					
 		/*
 		* Listeners for button presses and other event sources
 		*/
-	   sp.openButton.addActionListener(e -> sp.openFile());	    
+	   sp.openButton.addActionListener(e -> sp.openFile());	
+	   sp.encryptButton.addActionListener(e -> sp.encryptText());
+	   sp.decryptButton.addActionListener(e -> sp.decryptText());
+	   sp.bruteForceButton.addActionListener(e -> sp.bruteForceText()); 
 	} //END MAIN
 
 } // END CryptoMessage Class
