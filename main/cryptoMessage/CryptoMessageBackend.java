@@ -142,7 +142,6 @@ public class CryptoMessageBackend {
 		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), cipherName);
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, rng);
-	        final AlgorithmParameters params = cipher.getParameters();
 		} catch(/*InvalidKey*/Exception e) {
 			return "".getBytes();
 		}
