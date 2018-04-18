@@ -30,10 +30,10 @@ public class BackendDecryptionTest extends TestCase {
      * Initializes the test case
      */
     public BackendDecryptionTest(byte[] encryptedText, String expectedResult,
-                                 String passphrase) {
+                                 String passphrase, String algorithm) {
         super("BackendDecryptionTest", "Tests the backend functionality by " +
               "sending a ciphertext and password to the backend and " +
-              "expecting a plain test block back.");
+              "expecting a plain test block back.", algorithm);
         this.encryptedText = encryptedText;
         this.expectedResult = expectedResult;
         this.passphrase = passphrase;
@@ -54,7 +54,7 @@ public class BackendDecryptionTest extends TestCase {
         // pass back our encrypted file contents
         String result;
         try {
-            result = backEnd.decrypt(encryptedText, passphrase, "AES");
+            result = backEnd.decrypt(encryptedText, passphrase, algorithm);
         } catch(Exception e) {
             errorMessage = "An exception was thrown while decrypting.";
             return;

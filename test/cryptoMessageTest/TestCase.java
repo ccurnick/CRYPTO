@@ -32,6 +32,10 @@ public class TestCase {
      * A description for this test, detailing what entails
      */
     protected String description;
+    /**
+     * The algorithm to use for this test (AES/DES/DESede)
+     */
+    protected String algorithm;
     
     /**
      * Character set for UTF8
@@ -44,9 +48,10 @@ public class TestCase {
      * [String]title The title of the case
      * [String]description The description for the case
      */
-    protected TestCase(String title, String description) {
+    protected TestCase(String title, String description, String algorithm) {
         this.title = title;
         this.description = description;
+        this.algorithm = algorithm;
     }
 
     /**
@@ -112,5 +117,12 @@ public class TestCase {
      */
     public String getDescription() {
         return description;
+    }
+
+    /**
+     * Gets algorithm
+     */
+    public String getAlgorithm() {
+        return algorithm;
     }
 }

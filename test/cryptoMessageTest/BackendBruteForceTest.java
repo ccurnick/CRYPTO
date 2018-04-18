@@ -25,11 +25,11 @@ public class BackendBruteForceTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public BackendBruteForceTest(byte[] encryptedText, String expectedResult) {
+    public BackendBruteForceTest(byte[] encryptedText, String expectedResult, String algorithm) {
         super("BackendBruteForce", "Tests the backend functionality by " +
               "sending an encrypted text to the backend and expecting " +
               "a decrypted result within a reasonable(1 minute) amount " +
-              "of time.");
+              "of time.", algorithm);
         this.encryptedText = encryptedText;
         this.expectedResult = expectedResult;
     }
@@ -50,7 +50,7 @@ public class BackendBruteForceTest extends TestCase {
         // TODO:start a thread that expires after 5 minutes
         String result;
         try {
-            result = backEnd.bruteForce(encryptedText, "AES");
+            result = backEnd.bruteForce(encryptedText, algorithm);
         } catch(Exception e) {
             errorMessage = "An exception was thrown while brute forcing.";
             return;

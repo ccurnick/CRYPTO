@@ -25,10 +25,10 @@ public class E2EBruteForceTest extends TestCase {
     /**
      * Initializes the test case
      */
-    public E2EBruteForceTest(byte[] encryptedText, String expectedResult) {
+    public E2EBruteForceTest(byte[] encryptedText, String expectedResult, String algorithm) {
         super("E2EBruteForce", "Tests the end-to-end functionality by " +
                 "the actual window and simulates clicking the different " +
-                "components.");
+                "components.", algorithm);
 	    this.encryptedText = encryptedText;
 	    this.expectedResult = expectedResult;
     }

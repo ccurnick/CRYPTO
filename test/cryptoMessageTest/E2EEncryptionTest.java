@@ -30,10 +30,10 @@ public class E2EEncryptionTest extends TestCase {
      * Initializes the test case
      */
     public E2EEncryptionTest(String plainText, byte[] expectedResult,
-            String passphrase) {
+            String passphrase, String algorithm) {
         super("E2EEncryption", "Tests the end-to-end functionality by " +
               "the actual window and simulates clicking the different " +
-              "components.");
+              "components.", algorithm);
         this.plainText = plainText;
         this.expectedResult = expectedResult;
         this.passphrase = passphrase;

@@ -8,6 +8,7 @@
 package cryptoMessageTest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class TestMain {
@@ -29,19 +30,25 @@ public class TestMain {
     private TestMain() {
     	String testPassphrase = "123";
     	String testPlainText = "The quick brown fox jumped over the lazy dog.";
-    	byte[] testCipherText = new byte[] {
+    	byte[] testAESCipherText = new byte[] {
     			-12,-60,-121,-100,126,-111,70,82,-88,-23,63,108,97,19,-20,-26,
     			42,120,89,-7,33,12,-54,54,-32,-99,8,-12,118,-36,-49,118,89,44,
     			-87,77,69,71,-9,46,10,-90,20,124,51,119,-117,-121
     	};
+    	HashMap<String, byte[]> ciphers = new HashMap<String, byte[]>();
+    	ciphers.put("AES", testAESCipherText);
+    	ciphers.put("DES", testAESCipherText);
+    	ciphers.put("DESede", testAESCipherText);
         // Populate our list of tests with each type
     	tests = new ArrayList<TestCase>();
-        tests.add(new BackendBruteForceTest(testCipherText, testPlainText));
-        tests.add(new BackendEncryptionTest(testPlainText, testCipherText, testPassphrase));
-        tests.add(new BackendDecryptionTest(testCipherText, testPlainText, testPassphrase));
-        tests.add(new E2EBruteForceTest(testCipherText, testPlainText));
-        tests.add(new E2EEncryptionTest(testPlainText, testCipherText, testPassphrase));
-        tests.add(new E2EDecryptionTest(testCipherText, testPlainText, testPassphrase));
+    	for(String algorithm : ciphers.keySet()) {
+            //tests.add(new BackendBruteForceTest(ciphers.get(algorithm), testPlainText, algorithm));
+            tests.add(new BackendEncryptionTest(testPlainText, ciphers.get(algorithm), testPassphrase, algorithm));
+            tests.add(new BackendDecryptionTest(ciphers.get(algorithm), testPlainText, testPassphrase, algorithm));
+            //tests.add(new E2EBruteForceTest(ciphers.get(algorithm), testPlainText, algorithm));
+            //tests.add(new E2EEncryptionTest(testPlainText, ciphers.get(algorithm), testPassphrase, algorithm));
+            //tests.add(new E2EDecryptionTest(ciphers.get(algorithm), testPlainText, testPassphrase, algorithm));
+    	}
 
         // Loop through and run each test
         System.out.println("Beginning evaluation of tests...");
@@ -75,8 +82,8 @@ public class TestMain {
     private void runTest(TestCase testCase) {
         // Header information printed before the test is run
         System.out.println("=======BEGIN TEST======");
-        System.out.format("Test Name: %s", testCase.getTitle());
-        System.out.println("");
+        System.out.format("Test Name: %s\n", testCase.getTitle());
+        System.out.format("Test algorithm: %s\n", testCase.getAlgorithm());
         System.out.println("");
         System.out.println(testCase.getDescription());
         System.out.println("");
