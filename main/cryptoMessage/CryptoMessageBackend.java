@@ -30,15 +30,11 @@ public class CryptoMessageBackend {
 			// Handle no factory error
 		}
 		rng = new SecureRandom(new byte[] {0,1,2,3,4,5});
-		byte[] ivbytes = new byte[16];
-		for(int i = 0; i < 16; i++) {
-			ivbytes[i] = 1;
-		}
-		iv = new IvParameterSpec(ivbytes);
 	}
 
 	/**
 	 * Initializes a cipher for use by adding the appropriate padding mechanism and setting the object
+	 * Should support the following ciphers: AES, DES, DESede
 	 * 
 	 * @param cipherName				Name of cipher to use
 	 * @throws NoSuchAlgorithmException	Thrown from Cipher.getInstance
@@ -47,6 +43,24 @@ public class CryptoMessageBackend {
 	private void initializeCipher(String cipherName) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		cipher = Cipher.getInstance(cipherName + "/CBC/PKCS5Padding");
 		this.cipherName = cipherName;
+		int cipherSize = 0;
+		switch(cipherName) {
+			case "AES":
+				cipherSize = 16;
+				break;
+			case "DES":
+				cipherSize = 7;
+				break;
+			case "DESede":
+				cipherSize = 21;
+				break;
+			default:
+				throw new NoSuchAlgorithmException(); // This should never be reached as it should be caught by Cipher.getInstance
+		}
+		byte[] ivbytes = new byte[cipherSize];
+		for(int i = 0; i < 16; i++) {
+			ivbytes[i] = 1;
+		}
 	}
 	
 	/**
