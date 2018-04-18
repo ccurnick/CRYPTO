@@ -50,13 +50,13 @@ public class BackendBruteForceTest extends TestCase {
         // TODO:start a thread that expires after 1 minute
         String result;
         try {
-            result = backEnd.bruteForce(encryptedText);
+            result = backEnd.bruteForce(encryptedText, "AES");
         } catch(Exception e) {
             errorMessage = "An exception was thrown while brute forcing.";
             return;
         }
         // validate that the expected result is returned
-        if(result == expectedResult) {
+        if(result.compareTo(expectedResult) == 0) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +

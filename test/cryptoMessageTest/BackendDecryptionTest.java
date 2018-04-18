@@ -54,7 +54,7 @@ public class BackendDecryptionTest extends TestCase {
         // pass back our encrypted file contents
         String result;
         try {
-            result = backEnd.decrypt(encryptedText, passphrase);
+            result = backEnd.decrypt(encryptedText, passphrase, "AES");
         } catch(Exception e) {
             errorMessage = "An exception was thrown while decrypting.";
             return;

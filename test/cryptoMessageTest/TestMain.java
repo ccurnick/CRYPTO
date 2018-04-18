@@ -27,13 +27,13 @@ public class TestMain {
      * Main loop for the program
      */
     private TestMain() {
-    	String testPassphrase = "abc";
+    	String testPassphrase = "123";
     	String testPlainText = "The quick brown fox jumped over the lazy dog.";
     	byte[] testCipherText = new byte[] {
-    			-72,109,6,-71,0,81,-35,-9,126,-5,-90,-105,115,18,47,93,64,-113,-93,
-    			-110,-80,-30,-61,39,85,-102,-48,-114,-31,111,-38,22,-3,25,-23,38,
-    			38,-127,61,-99,37,81,-31,32,44,-31,6,-45
-    	}; // WARNING TODO: All tests will fail until this actually matches the encrypted string
+    			-12,-60,-121,-100,126,-111,70,82,-88,-23,63,108,97,19,-20,-26,
+    			42,120,89,-7,33,12,-54,54,-32,-99,8,-12,118,-36,-49,118,89,44,
+    			-87,77,69,71,-9,46,10,-90,20,124,51,119,-117,-121
+    	};
         // Populate our list of tests with each type
     	tests = new ArrayList<TestCase>();
         tests.add(new BackendBruteForceTest(testCipherText, testPlainText));

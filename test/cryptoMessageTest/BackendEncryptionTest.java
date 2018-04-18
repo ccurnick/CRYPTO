@@ -55,7 +55,7 @@ public class BackendEncryptionTest extends TestCase {
         // pass back our plain text file contents
         byte[] result;
         try {
-            result = backEnd.encrypt(plainText, passphrase);
+            result = backEnd.encrypt(plainText, passphrase, "AES");
         } catch(Exception e) {
             errorMessage = "An exception was thrown while encrypting.";
             return;
@@ -67,6 +67,7 @@ public class BackendEncryptionTest extends TestCase {
             errorMessage = String.format("Result was not the expected result.  " +
                     "Expected: %s, Received: %s",
                     new String(expectedResult, UTF8_CHARSET), new String(result, UTF8_CHARSET));
+            System.out.println("Resulting bits were:");
             for(int i = 0; i < result.length; i++) {
             	System.out.println(result[i]);
             }

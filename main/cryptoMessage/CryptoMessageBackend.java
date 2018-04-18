@@ -4,18 +4,19 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 import java.security.*;
 import java.security.spec.*;
-import java.util.Arrays;
-import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 
 
 public class CryptoMessageBackend {
 	private byte[] salt = "CryptoMessageMakeSalt".getBytes();
 	private SecretKeyFactory factory;
 	private Cipher cipher;
-	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
+	private final Charset ASCII_CHARSET = Charset.forName("US-ASCII");
+	private final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
 	private SecureRandom rng;
 	private IvParameterSpec iv;
+	private String cipherName;
 	public CryptoMessageBackend() {
 		// Blank constructor
 	}
@@ -25,13 +26,6 @@ public class CryptoMessageBackend {
 		} catch(NoSuchAlgorithmException e) {
 			// Handle no factory error
 		}
-		try {
-			cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		} catch(NoSuchAlgorithmException e) {
-			// Handle no algorithm error
-		} catch(NoSuchPaddingException e) {
-			// Handle no padding error
-		}
 		rng = new SecureRandom(new byte[] {0,1,2,3,4,5});
 		byte[] ivbytes = new byte[16];
 		for(int i = 0; i < 16; i++) {
@@ -39,9 +33,29 @@ public class CryptoMessageBackend {
 		}
 		iv = new IvParameterSpec(ivbytes);
 	}
-	public String decrypt(byte[] message, String secret) {
+
+	/**
+	 * Initializes a cipher for use by adding the appropriate padding mechanism and setting the object
+	 * 
+	 * @param cipherName				Name of cipher to use
+	 * @throws NoSuchAlgorithmException	Thrown from Cipher.getInstance
+	 * @throws NoSuchPaddingException	Thrown from Cipher.getInstance
+	 */
+	private void initializeCipher(String cipherName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+		cipher = Cipher.getInstance(cipherName + "/CBC/PKCS5Padding");
+		this.cipherName = cipherName;
+	}
+	
+	/**
+	 * Performs the actual decryption of encrypted text
+	 * 
+	 * @param message		Bytes to decrypt
+	 * @param secret		Secret to use to decrypt the text
+	 * @return Decrypted text on success, blank otherwise
+	 */
+	private String doDecrypt(byte[] message, String secret) {
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 65536, 256);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 128, 256);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
@@ -49,7 +63,7 @@ public class CryptoMessageBackend {
 			// More error messaging maybe?
 			return "";
 		}
-		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), cipherName);
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, secretKey, iv, rng);
 		} catch(InvalidKeyException e) {
@@ -58,15 +72,49 @@ public class CryptoMessageBackend {
 			return "";
 		}
 		try {
-			return new String(cipher.doFinal(message), UTF8_CHARSET);
+			return new String(cipher.doFinal(message), ASCII_CHARSET);
 		} catch(Exception e) {
 			// Fall through
 		}
 		return "";
 	}
-	public byte[] encrypt(String message, String secret) { 
+	/**
+	 * External interface to perform a decryption of an encrypted text
+	 * 
+	 * @param message		Bytes to decrypt
+	 * @param secret		Secret to use to decrypt the text
+	 * @param cipherName	Name of the cipher to use (AES)
+	 * @return Decrypted text on success, blank otherwise
+	 */
+	public String decrypt(byte[] message, String secret, String cipherName) {
+		try {
+			initializeCipher(cipherName);
+		} catch(NoSuchAlgorithmException e) {
+			return "";
+		} catch(NoSuchPaddingException e) {
+			return "";
+		}
+		return doDecrypt(message, secret);
+	}
+	
+	/**
+	 * External interface to perform an encryption of an encrypted text
+	 * 
+	 * @param message		Bytes to encrypt
+	 * @param secret		Secret to use to encrypt the text
+	 * @param cipherName	Name of the cipher to use (AES)
+	 * @return Encrypted text on success, blank otherwise
+	 */
+	public byte[] encrypt(String message, String secret, String cipherName) { 
+		try {
+			initializeCipher(cipherName);
+		} catch(NoSuchAlgorithmException e) {
+			return "".getBytes();
+		} catch(NoSuchPaddingException e) {
+			return "".getBytes();
+		}
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 65536, 256);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 128, 256);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
@@ -74,7 +122,7 @@ public class CryptoMessageBackend {
 			// More error messaging maybe?
 			return "".getBytes();
 		}
-		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+		SecretKey secretKey = new SecretKeySpec(tmp.getEncoded(), cipherName);
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, rng);
 	        final AlgorithmParameters params = cipher.getParameters();
@@ -83,20 +131,28 @@ public class CryptoMessageBackend {
 			return "".getBytes();
 		}
 		try {
-			return cipher.doFinal(message.getBytes("UTF-8"));
+			return cipher.doFinal(message.getBytes("US-ASCII"));
 		} catch(Exception e) {
 			// Fall through
 		}
 		return "".getBytes();
 	}
 
-	public String bruteForce(byte[] message) {
+	public String bruteForce(byte[] message, String cipherName) {
+		try {
+			initializeCipher(cipherName);
+		} catch(NoSuchAlgorithmException e) {
+			return "";
+		} catch(NoSuchPaddingException e) {
+			return "";
+		}
 		// Initialize our current secret key
 		byte[] currentSecretKey = incrementBruteForce(new byte[1]);
-		String result = decrypt(message, new String(currentSecretKey, UTF8_CHARSET));
-		while(result.length() == 0) {
+		String result = doDecrypt(message, new String(currentSecretKey, ASCII_CHARSET));
+		while(result.length() == 0 || !ASCII_ENCODER.canEncode(result)) {
 			currentSecretKey = incrementBruteForce(currentSecretKey);
-			result = decrypt(message, new String(currentSecretKey, UTF8_CHARSET));
+			String strValue = new String(currentSecretKey, ASCII_CHARSET);
+			result = doDecrypt(message, strValue);
 		}
 		return result;
 	}
@@ -110,6 +166,9 @@ public class CryptoMessageBackend {
 			} else {
 				// If the value isn't max then increment it and return out
 				arr[i] = (byte)(arr[i] + 1);
+				if(i == 0 && arr.length > 2) {
+					System.err.println("Incrementing first value, new value is: <" + (new String(arr, ASCII_CHARSET)) + ">");
+				}
 				return arr;
 			}
 		}
