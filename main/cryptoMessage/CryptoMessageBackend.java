@@ -12,7 +12,10 @@ public class CryptoMessageBackend {
 	private byte[] salt = "CryptoMessageMakeSalt".getBytes();
 	private SecretKeyFactory factory;
 	private Cipher cipher;
-	private final Charset ASCII_CHARSET = Charset.forName("US-ASCII");
+	private final String characterSetName = "US-ASCII";
+	private final int PBEPERMUTATIONS = 128;
+	private final int PBEKEYSIZE = 256;
+	private final Charset ASCII_CHARSET = Charset.forName(characterSetName);
 	private final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
 	private SecureRandom rng;
 	private IvParameterSpec iv;
@@ -55,7 +58,7 @@ public class CryptoMessageBackend {
 	 */
 	private String doDecrypt(byte[] message, String secret) {
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 128, 256);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, PBEKEYSIZE);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
@@ -114,7 +117,7 @@ public class CryptoMessageBackend {
 			return "".getBytes();
 		}
 		/* Derive the key, given password and salt. */
-		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, 128, 256);
+		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, PBEKEYSIZE);
 		SecretKey tmp;
 		try {
 			tmp = factory.generateSecret(spec);
@@ -126,12 +129,11 @@ public class CryptoMessageBackend {
 		try {
 			cipher.init(Cipher.ENCRYPT_MODE, secretKey, iv, rng);
 	        final AlgorithmParameters params = cipher.getParameters();
-	        System.out.println(params.getAlgorithm());
 		} catch(/*InvalidKey*/Exception e) {
 			return "".getBytes();
 		}
 		try {
-			return cipher.doFinal(message.getBytes("US-ASCII"));
+			return cipher.doFinal(message.getBytes(characterSetName));
 		} catch(Exception e) {
 			// Fall through
 		}
