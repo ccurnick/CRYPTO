@@ -12,18 +12,20 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.IOException;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -32,8 +34,6 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
-import org.w3c.dom.ls.LSException;
 
 /*
 * Class for building the CryptoMessage GUI.
@@ -58,7 +58,7 @@ public class CryptoMessageGUI extends JFrame{
 	private JComboBox<String> cryptoDropBox = new JComboBox<String>(cryptoChoice);
 	private JComboBox<String> decryptDropBox = new JComboBox<String>(cryptoChoice);
 	private CryptoMessageBackend cryptoBackend = new CryptoMessageBackend();
-	private Path openFile;
+	private File openFile;
 
 	/*
 	 * Default constructor
@@ -150,51 +150,66 @@ public class CryptoMessageGUI extends JFrame{
     		frame.setMinimumSize(tabbedPane.getSize());
     		frame.setResizable(true);
     		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    		
+			
+			/*
+			 * Initializing CryptoBackend
+			 */
+			cryptoBackend.init();
+
     } //END CryptoMessageGUI Constructor
 
 	/*
-	* Internal method for opening a file and displaying its contents in the display
+	 * Internal method for calling encrypt() in backend after button press
+	 */
+	private void encryptText(){
+		//Creating new filechooser
+		fc = new JFileChooser();
+		fc .setCurrentDirectory(new java.io.File("."));
+		fc.setDialogTitle("Save results as...");           		     			
+					
+		//Encrypting text and writing it to file.
+		if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+			byte[] results;
+			results = cryptoBackend.encrypt(encryptTextDisplay.getText(), keyText.getText(), cryptoDropBox.getSelectedItem().toString());
+			try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath())){
+				fos.write(results);
+			} catch (IOException e) {
+				System.out.print(e);
+			}
+		}
+	} //END encryptText() Method
+
+	/*
+	* Internal method for opening a file for decryption
 	*/
     private void openFile(){
 		//Creating new filechooser and setting file filters
 		fc = new JFileChooser();
         fc .setCurrentDirectory(new java.io.File("."));
-        fc.setDialogTitle("Select Data File");           		
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("txt Files", "txt", "text");
-        fc.setFileFilter(filter);
-        fc.setAcceptAllFileFilterUsed(false);      			
-
-        //Show the dialog window
-		int returnVal = fc.showOpenDialog(null);
+        fc.setDialogTitle("Select Data File");           		   			
 			
 		//Displaying Path to selected file.
-    	if (returnVal == JFileChooser.APPROVE_OPTION) {
-			openFile = Paths.get(fc.getSelectedFile().getAbsolutePath());
+    	if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+			openFile = fc.getSelectedFile();
 			openText.setText("Current File: " + fc.getSelectedFile().getName());
 		}
     } //END openFile() Method
-	
-	/*
-	 * Internal method for calling encrypt() in backend after button press
-	 */
-	private void encryptText(){
-		cryptoBackend.encrypt(encryptTextDisplay.getText(), keyText.getText(), cryptoDropBox.getSelectedItem().toString());
-	} //END encryptText() Method
 	
 	/*
 	 * Internal method for calling decrypt() in backend after button press
 	 * Reads the selected file into a byte array to pass it to backend.
 	 */
 	private void decryptText(){
-		Files file = null;
 		byte[] array = null;
+		Path filePath = Paths.get(openFile.getAbsolutePath());
 		try{
-		array = file.readAllBytes(openFile);
+		array = Files.readAllBytes(filePath);
 		} catch (IOException e) {
 			System.out.print(e);
 		} 
-		cryptoBackend.decrypt(array, decryptKeyText.getText(), decryptDropBox.getSelectedItem().toString());
+		System.out.println(array.length);
+		decryptTextDisplay.setText(cryptoBackend.decrypt(array, decryptKeyText.getText(), decryptDropBox.getSelectedItem().toString()));
 	}
 
 	/*
