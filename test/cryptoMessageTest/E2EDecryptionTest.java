@@ -7,6 +7,10 @@
  */
 package cryptoMessageTest;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import cryptoMessage.CryptoMessageGUI;
 
 public class E2EDecryptionTest extends TestCase {
@@ -43,20 +47,41 @@ public class E2EDecryptionTest extends TestCase {
      * Performs a test of the front end
      */
     protected void runTest() {
+        // Create the frontend
         frontEnd = new CryptoMessageGUI();
         // relink the buttons
+        frontEnd.decryptButton.addActionListener(e -> frontEnd.decryptText());
+        // Select the appropriate algorithm
+        frontEnd.decryptDropBox.setSelectedItem(algorithm);
         // populate the passphrase with "abc"
-        // click the decrypt button
+        frontEnd.decryptKeyText.setText(passphrase);
         // pass back our file
-        String result = "";
-        // TODO: pull the result from the text field
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("GUI-test-", ".tmp");
+        } catch(IOException e) {
+            errorMessage = e.getMessage();
+            return;
+        }
+        try (FileOutputStream fos = new FileOutputStream(tempFile.getAbsolutePath())){
+            fos.write(encryptedText);
+        } catch (IOException e) {
+            errorMessage = e.getMessage();
+            return;
+        }
+        frontEnd.openFile = tempFile;
+        // Simulate clicking the decrypt button
+        frontEnd.decryptButton.doClick();
+        // Pull the result from the text field
+        String result = frontEnd.decryptTextDisplay.getText();
         // validate that the expected result is in the text field
-        if(result == expectedResult) {
+        if(result.compareTo(expectedResult) == 0) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
                     "Expected: %s, Received: %s",
                     expectedResult, result);
         }
+        tempFile.delete();
     }
 }

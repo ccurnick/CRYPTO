@@ -7,6 +7,13 @@
  */
 package cryptoMessageTest;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 import cryptoMessage.CryptoMessageGUI;
 
 public class E2EEncryptionTest extends TestCase {
@@ -43,19 +50,44 @@ public class E2EEncryptionTest extends TestCase {
      * Performs a test of the front end
      */
     protected void runTest() {
+        // Create the frontend
         frontEnd = new CryptoMessageGUI();
-        // relink the buttons
-        // populate the passphrase with "abc"
-        // click the encrypt button
-        byte[] result = new byte[1];
-        // TODO: pull the result from the text field
+        // relink the buttons (bypassing the file selection)
+        frontEnd.encryptButton.addActionListener(e -> frontEnd.encryptText());
+        // Select the appropriate algorithm
+        frontEnd.cryptoDropBox.setSelectedItem(algorithm);
+        // populate the passphrase
+        frontEnd.keyText.setText(passphrase);
+        // Populate the text to encrypt appropriately
+        frontEnd.encryptTextDisplay.setText(plainText);
+        // pass back our file
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("GUI-test-", ".tmp");
+        } catch(IOException e) {
+            errorMessage = e.getMessage();
+            return;
+        }
+        frontEnd.openFile = tempFile;
+        // Simulate clicking the decrypt button
+        frontEnd.encryptButton.doClick();
+        // Pull the result from the text field
+		Path filePath = Paths.get(tempFile.getAbsolutePath());
+		byte[] result = null;
+		try{
+		    result = Files.readAllBytes(filePath);
+		} catch (IOException e) {
+            errorMessage = e.getMessage();
+            return;
+		}
         // validate that the expected result is in the text field
-        if(result == expectedResult) {
+        if(Arrays.equals(result,expectedResult)) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
-                           "Expected: %s, Received: %s",
-                           expectedResult, result);
+                    "Expected: %s, Received: %s",
+                    expectedResult, result);
         }
+        tempFile.delete();
     }
 }
