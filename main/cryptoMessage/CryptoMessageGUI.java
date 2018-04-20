@@ -55,10 +55,10 @@ public class CryptoMessageGUI extends JFrame{
 	public JButton decryptButton = new JButton("Decrypt");
 	public JButton bruteForceButton = new JButton("Brute Force");
 	private String[] cryptoChoice = {"AES", "DES", "DESede"};
-	private JComboBox<String> cryptoDropBox = new JComboBox<String>(cryptoChoice);
-	private JComboBox<String> decryptDropBox = new JComboBox<String>(cryptoChoice);
+	public JComboBox<String> cryptoDropBox = new JComboBox<String>(cryptoChoice);
+	public JComboBox<String> decryptDropBox = new JComboBox<String>(cryptoChoice);
 	private CryptoMessageBackend cryptoBackend = new CryptoMessageBackend();
-	private File openFile;
+	public File openFile;
 
 	/*
 	 * Default constructor
@@ -156,12 +156,13 @@ public class CryptoMessageGUI extends JFrame{
 			 */
 			cryptoBackend.init();
 
-    } //END CryptoMessageGUI Constructor
-
-	/*
-	 * Internal method for calling encrypt() in backend after button press
+	} //END CryptoMessageGUI Constructor
+	
+	/**
+	 * Internal method for selecting an output file for encryption the encrypted
+	 * the text field to that file
 	 */
-	private void encryptText(){
+	private void selectFileAndEncryptText() {
 		//Creating new filechooser
 		fc = new JFileChooser();
 		fc .setCurrentDirectory(new java.io.File("."));
@@ -169,14 +170,21 @@ public class CryptoMessageGUI extends JFrame{
 					
 		//Encrypting text and writing it to file.
 		if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-			File file = fc.getSelectedFile();
-			byte[] results;
-			results = cryptoBackend.encrypt(encryptTextDisplay.getText(), keyText.getText(), cryptoDropBox.getSelectedItem().toString());
-			try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath())){
-				fos.write(results);
-			} catch (IOException e) {
-				System.out.print(e);
-			}
+			openFile = fc.getSelectedFile();
+			encryptText();
+		}
+	}
+
+	/*
+	 * Internal method for calling encrypt() in backend after button press
+	 */
+	public void encryptText(){
+		byte[] results;
+		results = cryptoBackend.encrypt(encryptTextDisplay.getText(), keyText.getText(), cryptoDropBox.getSelectedItem().toString());
+		try (FileOutputStream fos = new FileOutputStream(openFile.getAbsolutePath())){
+			fos.write(results);
+		} catch (IOException e) {
+			System.out.print(e);
 		}
 	} //END encryptText() Method
 
@@ -200,7 +208,7 @@ public class CryptoMessageGUI extends JFrame{
 	 * Internal method for calling decrypt() in backend after button press
 	 * Reads the selected file into a byte array to pass it to backend.
 	 */
-	private void decryptText(){
+	public void decryptText(){
 		byte[] array = null;
 		Path filePath = Paths.get(openFile.getAbsolutePath());
 		try{
@@ -248,7 +256,7 @@ public class CryptoMessageGUI extends JFrame{
 		* Listeners for button presses and other event sources
 		*/
 	   sp.openButton.addActionListener(e -> sp.openFile());	
-	   sp.encryptButton.addActionListener(e -> sp.encryptText());
+	   sp.encryptButton.addActionListener(e -> sp.selectFileAndEncryptText());
 	   sp.decryptButton.addActionListener(e -> sp.decryptText());
 	   sp.bruteForceButton.addActionListener(e -> sp.bruteForceText()); 
 	} //END MAIN
