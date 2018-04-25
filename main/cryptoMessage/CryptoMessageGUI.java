@@ -46,17 +46,21 @@ public class CryptoMessageGUI extends JFrame{
 	private JFileChooser fc;
 	public JTextArea encryptTextDisplay = new JTextArea();
 	public JTextArea decryptTextDisplay = new JTextArea();
-    private JLabel openText = new JLabel("**File Name Appears Here**");
+	public JTextArea bruteTextDisplay = new JTextArea();
+	private JLabel openText = new JLabel("**File Name Appears Here**");
+	private JLabel openBruteText = new JLabel("**File Name Appears Here**");
 	public JTextField keyText = new JTextField();
 	public JTextField decryptKeyText = new JTextField();
-	public JFrame frame = new JFrame("Crypto Message Maker 0.1");
+	public JFrame frame = new JFrame("Crypto Message Maker 0.5");
 	public JButton openButton = new JButton("Open File");
+	public JButton openBruteButton = new JButton("Open File");
 	public JButton encryptButton = new JButton("Encrypt");
 	public JButton decryptButton = new JButton("Decrypt");
 	public JButton bruteForceButton = new JButton("Brute Force");
 	private String[] cryptoChoice = {"AES", "DES", "DESede"};
 	public JComboBox<String> cryptoDropBox = new JComboBox<String>(cryptoChoice);
 	public JComboBox<String> decryptDropBox = new JComboBox<String>(cryptoChoice);
+	public JComboBox<String> bruteDropBox = new JComboBox<String>(cryptoChoice);
 	private CryptoMessageBackend cryptoBackend = new CryptoMessageBackend();
 	public File openFile;
 
@@ -72,6 +76,9 @@ public class CryptoMessageGUI extends JFrame{
 		JPanel encryptPanel = new JPanel(new BorderLayout());
 		JPanel encryptControlPanel = new JPanel(new GridBagLayout());
 		JPanel encryptTextPanel = new JPanel(new BorderLayout());
+		JPanel brutePanel = new JPanel(new BorderLayout());
+		JPanel bruteControlPanel = new JPanel(new GridBagLayout());
+		JPanel bruteTextPanel = new JPanel(new BorderLayout());
 		JPanel decryptPanel = new JPanel(new BorderLayout());
 		JPanel decryptControlPanel = new JPanel(new GridBagLayout());
 		JPanel decryptTextPanel = new JPanel(new BorderLayout());
@@ -91,14 +98,18 @@ public class CryptoMessageGUI extends JFrame{
 			encryptTextPanel.setBorder(BorderFactory.createTitledBorder(loweredetched));
 			decryptPanel.setBorder(BorderFactory.createTitledBorder(loweredetched, "Decrypted Message"));
 			decryptTextPanel.setBorder(BorderFactory.createTitledBorder(loweredetched));
+			brutePanel.setBorder(BorderFactory.createTitledBorder(loweredetched, "Brute Force Decrypted Message"));
+			bruteTextPanel.setBorder(BorderFactory.createTitledBorder(loweredetched));
 
 			/*
     		 * Add text panels to JScrollPanes for Encrypt Display and Decrypt Display
     		 */
 			JScrollPane encryptScroll = new JScrollPane(encryptTextDisplay); 
 			JScrollPane decryptScroll = new JScrollPane(decryptTextDisplay); 
+			JScrollPane bruteScroll = new JScrollPane(bruteTextDisplay); 
 			encryptTextPanel.add(encryptScroll, BorderLayout.CENTER);
 			decryptTextPanel.add(decryptScroll, BorderLayout.CENTER);
+			bruteTextPanel.add(bruteScroll, BorderLayout.CENTER);
 			
     		/*
     		 * Add Components to control panels using addComp Method for 
@@ -114,7 +125,11 @@ public class CryptoMessageGUI extends JFrame{
 			addComp(decryptControlPanel, decryptKeyLabel, 0, 1, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
     		addComp(decryptControlPanel, decryptKeyText, 1, 1, 1, 1, GridBagConstraints.PAGE_START, GridBagConstraints.NONE);
 			addComp(decryptControlPanel, decryptDropBox, 2, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
-			addComp(decryptControlPanel, decryptButton, 3, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);   				
+			addComp(decryptControlPanel, decryptButton, 3, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
+			addComp(bruteControlPanel, openBruteButton, 0, 0, 1, 1, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE);
+			addComp(bruteControlPanel, openBruteText, 1, 0, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
+			addComp(bruteControlPanel, bruteDropBox, 2, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);
+			addComp(bruteControlPanel, bruteForceButton, 3, 1, 1, 1, GridBagConstraints.FIRST_LINE_END, GridBagConstraints.NONE);   				
 
 			/*
 			* Adding all elements to the encrypt and decrypt panels.
@@ -123,12 +138,15 @@ public class CryptoMessageGUI extends JFrame{
 			encryptPanel.add(encryptTextPanel, BorderLayout.CENTER);
 			decryptPanel.add(decryptControlPanel, BorderLayout.NORTH);
 			decryptPanel.add(decryptTextPanel, BorderLayout.CENTER);
+			brutePanel.add(bruteControlPanel, BorderLayout.NORTH);
+			brutePanel.add(bruteTextPanel, BorderLayout.CENTER);
 			
 			/*
 			* Adding the encrypt and decrypt panels to the tabbed panel.
 			*/
     		tabbedPane.addTab("Encrypt Message", encryptPanel);
 			tabbedPane.addTab("Decrypt Message", decryptPanel);
+			tabbedPane.addTab("Brute Force Decrypt Message", brutePanel);
 
             /*
             * Adjusting size and opacity of text boxes
@@ -137,6 +155,8 @@ public class CryptoMessageGUI extends JFrame{
 			encryptTextDisplay.setRows(10);
 			decryptTextDisplay.setRows(10);
 			decryptTextDisplay.setColumns(30);
+			bruteTextDisplay.setColumns(30);
+			bruteTextDisplay.setRows(10);
 			keyText.setColumns(15);
 			decryptKeyText.setColumns(15);
 			openText.setOpaque(true);
@@ -146,6 +166,7 @@ public class CryptoMessageGUI extends JFrame{
     		 */
 			encryptPanel.validate();
 			decryptPanel.validate();
+			brutePanel.validate();
 			frame.pack();
     		frame.setMinimumSize(tabbedPane.getSize());
     		frame.setResizable(true);
@@ -225,8 +246,16 @@ public class CryptoMessageGUI extends JFrame{
 	 * Reads the selected file into a byte array to pass it to backend.
 	 */
 	private void bruteForceText(){
-		//***Place holder until brute force decryption implemented.***
-	}
+		byte[] array = null;
+		Path filePath = Paths.get(openFile.getAbsolutePath());
+		try{
+		array = Files.readAllBytes(filePath);
+		} catch (IOException e) {
+			System.out.print(e);
+		} 
+		System.out.println(array.length);
+		bruteTextDisplay.setText(cryptoBackend.bruteForce(array, bruteDropBox.getSelectedItem().toString()));
+	}	
 
     /*
      * Method for adding Components to JPanels using GridBagLayout. 
@@ -258,6 +287,7 @@ public class CryptoMessageGUI extends JFrame{
 	   sp.openButton.addActionListener(e -> sp.openFile());	
 	   sp.encryptButton.addActionListener(e -> sp.selectFileAndEncryptText());
 	   sp.decryptButton.addActionListener(e -> sp.decryptText());
+	   sp.openBruteButton.addActionListener(e -> sp.openFile()); 
 	   sp.bruteForceButton.addActionListener(e -> sp.bruteForceText()); 
 	} //END MAIN
 
