@@ -48,7 +48,7 @@ public class CryptoMessageBackend {
 		switch(cipherName) {
 			case "AES":
 				cipherSize = 16;
-				pbekeysize = 256;
+				pbekeysize = 128;
 				break;
 			case "DES":
 				cipherSize = 8;
