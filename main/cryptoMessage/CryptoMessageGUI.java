@@ -212,7 +212,7 @@ public class CryptoMessageGUI extends JFrame{
 	/*
 	* Internal method for opening a file for decryption
 	*/
-    private void openFile(){
+    private void openFile(JLabel field){
 		//Creating new filechooser and setting file filters
 		fc = new JFileChooser();
         fc .setCurrentDirectory(new java.io.File("."));
@@ -221,7 +221,7 @@ public class CryptoMessageGUI extends JFrame{
 		//Displaying Path to selected file.
     	if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 			openFile = fc.getSelectedFile();
-			openText.setText("Current File: " + fc.getSelectedFile().getName());
+			field.setText("Current File: " + fc.getSelectedFile().getName());
 		}
     } //END openFile() Method
 	
@@ -284,10 +284,10 @@ public class CryptoMessageGUI extends JFrame{
 		/*
 		* Listeners for button presses and other event sources
 		*/
-	   sp.openButton.addActionListener(e -> sp.openFile());	
+	   sp.openButton.addActionListener(e -> sp.openFile(sp.openText));	
 	   sp.encryptButton.addActionListener(e -> sp.selectFileAndEncryptText());
 	   sp.decryptButton.addActionListener(e -> sp.decryptText());
-	   sp.openBruteButton.addActionListener(e -> sp.openFile()); 
+	   sp.openBruteButton.addActionListener(e -> sp.openFile(sp.openBruteText)); 
 	   sp.bruteForceButton.addActionListener(e -> sp.bruteForceText()); 
 	} //END MAIN
 
