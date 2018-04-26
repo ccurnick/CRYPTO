@@ -7,6 +7,9 @@
  */
 package cryptoMessageTest;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.FileOutputStream;
 import cryptoMessage.CryptoMessageGUI;
 
 public class E2EBruteForceTest extends TestCase {
@@ -37,20 +40,39 @@ public class E2EBruteForceTest extends TestCase {
      * Performs a test of the front end
      */
     protected void runTest() {
+        // Create the frontend
         frontEnd = new CryptoMessageGUI();
         // relink the buttons
-        // click the brute force button
+        frontEnd.bruteForceButton.addActionListener(e -> frontEnd.bruteForceText());
+        // Select the appropriate algorithm
+        frontEnd.bruteDropBox.setSelectedItem(algorithm);
         // pass back our file
-        // start a thread that expires after 1 minute
-        String result = "";
-        // TODO: pull the result from the text field
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("GUI-test-", ".tmp");
+        } catch(IOException e) {
+            errorMessage = e.getMessage();
+            return;
+        }
+        try (FileOutputStream fos = new FileOutputStream(tempFile.getAbsolutePath())){
+            fos.write(encryptedText);
+        } catch (IOException e) {
+            errorMessage = e.getMessage();
+            return;
+        }
+        frontEnd.openFile = tempFile;
+        // Simulate clicking the decrypt button
+        frontEnd.bruteForceButton.doClick();
+        // Pull the result from the text field
+        String result = frontEnd.bruteTextDisplay.getText();
         // validate that the expected result is in the text field
-        if(result == expectedResult) {
+        if(result.compareTo(expectedResult) == 0) {
             successful = true;
         } else {
             errorMessage = String.format("Result was not the expected result.  " +
                     "Expected: %s, Received: %s",
-                    expectedResult, result);	
+                    expectedResult, result);
         }
+        tempFile.delete();
     }
 }

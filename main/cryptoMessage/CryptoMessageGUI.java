@@ -245,7 +245,7 @@ public class CryptoMessageGUI extends JFrame{
 	 * Internal method for calling bruteForce() in backend after button press
 	 * Reads the selected file into a byte array to pass it to backend.
 	 */
-	private void bruteForceText(){
+	public void bruteForceText(){
 		byte[] array = null;
 		Path filePath = Paths.get(openFile.getAbsolutePath());
 		try{
