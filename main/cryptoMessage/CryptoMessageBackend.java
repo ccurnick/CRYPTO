@@ -6,7 +6,7 @@ import java.security.*;
 import java.security.spec.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-
+import java.util.*;
 
 public class CryptoMessageBackend {
 	private byte[] salt = "CryptoMessageMakeSalt".getBytes();
@@ -14,8 +14,9 @@ public class CryptoMessageBackend {
 	private Cipher cipher;
 	private final String characterSetName = "US-ASCII";
 	private final int PBEPERMUTATIONS = 128;
-	private final Charset ASCII_CHARSET = Charset.forName(characterSetName);
-	private final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
+	private final int POOLSIZE = 10;
+	protected final Charset ASCII_CHARSET = Charset.forName(characterSetName);
+	protected final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
 	private SecureRandom rng;
 	private IvParameterSpec iv;
 	private int pbekeysize;
@@ -41,7 +42,7 @@ public class CryptoMessageBackend {
 	 * @throws NoSuchAlgorithmException	Thrown from Cipher.getInstance
 	 * @throws NoSuchPaddingException	Thrown from Cipher.getInstance
 	 */
-	private void initializeCipher(String cipherName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+	public void initializeCipher(String cipherName) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		cipher = Cipher.getInstance(cipherName + "/CBC/PKCS5Padding");
 		this.cipherName = cipherName;
 		int cipherSize = 0;
@@ -75,7 +76,7 @@ public class CryptoMessageBackend {
 	 * @param secret		Secret to use to decrypt the text
 	 * @return Decrypted text on success, blank otherwise
 	 */
-	private String doDecrypt(byte[] message, String secret) {
+	protected String doDecrypt(byte[] message, String secret) {
 		/* Derive the key, given password and salt. */
 		KeySpec spec = new PBEKeySpec(secret.toCharArray(), salt, PBEPERMUTATIONS, pbekeysize);
 		SecretKey tmp;
@@ -182,47 +183,33 @@ public class CryptoMessageBackend {
 			errorMessage = "NSP:" + e.getMessage();
 			return "";
 		}
+		// Ensure the brute force threads are in a clean state
+		BruteForceThread.reset();
 		// Initialize our current secret key
-		byte[] currentSecretKey = incrementBruteForce(new byte[1]);
-		String result = doDecrypt(message, new String(currentSecretKey, ASCII_CHARSET));
-		while(result.length() == 0 || !ASCII_ENCODER.canEncode(result)) {
-			currentSecretKey = incrementBruteForce(currentSecretKey);
-			String strValue = new String(currentSecretKey, ASCII_CHARSET);
-			result = doDecrypt(message, strValue);
+		// Create threads for performing the brute forcing
+		List<BruteForceThread> threads = new ArrayList<BruteForceThread>();
+		for(int i = 0; i < POOLSIZE; i++) {
+			BruteForceThread thread;
+			try {
+				thread = new BruteForceThread(POOLSIZE, message, i, cipherName);
+			} catch(NoSuchAlgorithmException e) {
+				errorMessage = "NSA:" + e.getMessage();
+				return "";
+			} catch(NoSuchPaddingException e) {
+				errorMessage = "NSP:" + e.getMessage();
+				return "";
+			}
+			threads.add(thread);
+			thread.start();
 		}
-		return result;
-	}
-
-	/**
-	 * Increments a possible brute force password value
-	 * Increases from ABC -> ABD or from ZZZ -> AAAA
-	 * 
-	 * @param arr	Bytes to increase value of
-	 * @return 		New password value to attempt
-	 */
-	private byte[] incrementBruteForce(byte[] arr) {
-		// Loop through each character, starting with the final character
-		for(int i = arr.length - 1; i >= 0; i--) {
-			// If the value is 126 (max), reset it to 32 (min) and go on to the previous index
-			if(arr[i] == 126) {
-				arr[i] = 32;
-			} else {
-				// If the value isn't max then increment it and return out
-				arr[i] = (byte)(arr[i] + 1);
-				if(i == 0 && arr.length > 2) {
-					System.err.println("Incrementing first value, new value is: <" + (new String(arr, ASCII_CHARSET)) + ">");
-				}
-				return arr;
+		for(int i = 0; i < POOLSIZE; i++) {
+			try {
+				threads.get(i).join();
+			} catch(InterruptedException e) {
+				//silently continue
 			}
 		}
-		// If we made it to here then every character was incremented
-		// This means an additional character needs to be added
-		// Example: ZZ + 1 = AAA (not exactly but it explains it)
-		arr = new byte[arr.length + 1];
-		for(int i = 0; i < arr.length; i++) {
-			arr[i] = 32;
-		}
-		System.err.println(String.format("Expanding brute force size to %d characters", arr.length));
-		return arr;
+
+		return BruteForceThread.result;
 	}
 }
