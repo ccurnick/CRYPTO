@@ -28,7 +28,7 @@ public class TestMain {
      * Main loop for the program
      */
     private TestMain() {
-    	String testPassphrase = "123";
+        String testPassphrase = "123";
     	String testPlainText = "The quick brown fox jumped over the lazy dog.";
     	byte[] testAESCipherText = new byte[] {
     			-67,-89,-110,-90,112,-105,64,-8,-62,-34,121,112,-84,-29,-84,
@@ -46,6 +46,8 @@ public class TestMain {
     			-66,29,-75,-50,-53,-19,94,121,5,113,-77,103,-82,91,-121,
     			-123,53,58,66,17,123,-85,-39,116,16,3,126,89,39,-117,77,1
     	};
+        String invalidTestPassphrase = "124";
+        String invalidTestCipherText = "";
     	HashMap<String, byte[]> ciphers = new HashMap<String, byte[]>();
     	ciphers.put("AES", testAESCipherText);
     	ciphers.put("DES", testDESCipherText);
@@ -59,6 +61,8 @@ public class TestMain {
             tests.add(new E2EBruteForceTest(ciphers.get(algorithm), testPlainText, algorithm));
             tests.add(new E2EEncryptionTest(testPlainText, ciphers.get(algorithm), testPassphrase, algorithm));
             tests.add(new E2EDecryptionTest(ciphers.get(algorithm), testPlainText, testPassphrase, algorithm));
+            tests.add(new BackendDecryptionTest(ciphers.get(algorithm), invalidTestCipherText, invalidTestPassphrase, algorithm));
+            tests.add(new E2EDecryptionTest(ciphers.get(algorithm), invalidTestCipherText, invalidTestPassphrase, algorithm));
     	}
 
         // Loop through and run each test
