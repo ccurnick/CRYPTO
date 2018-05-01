@@ -1,3 +1,15 @@
+/**
+ * File Name: CryptoMessageBackend.java
+ * Date: 30 APR 2018
+ * Author: Team Crypto 2018! 
+ * Purpose: This class serves to represent the backend of the CryptoMessage
+ * 			application
+ * 
+ * The backend of CryptoMessage is broken up into 3 different workflows:
+ * - Brute Force
+ * - Decryption
+ * - Encryption
+ */
 package cryptoMessage;
 
 import javax.crypto.*;
@@ -9,22 +21,36 @@ import java.nio.charset.CharsetEncoder;
 import java.util.*;
 
 public class CryptoMessageBackend {
+	// Salt used by all encryption/decryption attempts
 	private byte[] salt = "CryptoMessageMakeSalt".getBytes();
+	// Secret key factory used to build a key
 	private SecretKeyFactory factory;
+	// Cipher used to en/decrypt
 	private Cipher cipher;
+	// Character set used to ensure the decryption was successful
 	private final String characterSetName = "US-ASCII";
+	// How many times the encryption key text is garbled before used as a key
 	private final int PBEPERMUTATIONS = 128;
+	// Number of threads to spawn during brute forcing
 	private final int POOLSIZE = 10;
+	// Character set derived from the character set name
 	protected final Charset ASCII_CHARSET = Charset.forName(characterSetName);
+	// Character encoder used for transferring around byte/string transformations
 	protected final CharsetEncoder ASCII_ENCODER = ASCII_CHARSET.newEncoder();
+	// Used to statically set the key/iv
 	private SecureRandom rng;
+	// IV used as part of the encryption process
 	private IvParameterSpec iv;
+	// Key size determined by the algorithm to used during de/encryption
 	private int pbekeysize;
+	// Name of cipher to use (AES/DES/DESede)
 	private String cipherName;
+	// Error message that occurred (if any)
 	public String errorMessage;
-	public CryptoMessageBackend() {
-		// Blank constructor
-	}
+	/**
+	 * Initializes the engine for performing an action
+	 * Must be called prior to anything else
+	 */
 	public void init() {
 		try {
 			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
@@ -43,9 +69,11 @@ public class CryptoMessageBackend {
 	 * @throws NoSuchPaddingException	Thrown from Cipher.getInstance
 	 */
 	public void initializeCipher(String cipherName) throws NoSuchAlgorithmException, NoSuchPaddingException {
+		// Get the cipher object based off the cipher name
 		cipher = Cipher.getInstance(cipherName + "/CBC/PKCS5Padding");
 		this.cipherName = cipherName;
 		int cipherSize = 0;
+		// Determine the cipher key and iv size based off the cipher
 		switch(cipherName) {
 			case "AES":
 				cipherSize = 16;
@@ -62,6 +90,7 @@ public class CryptoMessageBackend {
 			default:
 				throw new NoSuchAlgorithmException(); // This should never be reached as it should be caught by Cipher.getInstance
 		}
+		// Set each byte in the IV to '1'
 		byte[] ivbytes = new byte[cipherSize];
 		for(int i = 0; i < cipherSize; i++) {
 			ivbytes[i] = 1;
