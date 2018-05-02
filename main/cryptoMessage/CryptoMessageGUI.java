@@ -19,6 +19,13 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
+<<<<<<< HEAD
+=======
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+>>>>>>> fbaeaf1ca33d73c533a3c3adf2b10bd6b3c319f0
 
 /*
 * Class for building the CryptoMessage GUI.
